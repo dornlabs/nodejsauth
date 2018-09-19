@@ -38,7 +38,7 @@ class Auth {
     }
 
 
-    static returnConnectionStringReplica(){
+    static returnConnectionString(){
         return mongoUriBuilder(
             {  
                 host: "localhost",
@@ -67,7 +67,7 @@ class Auth {
             username : _username,
             password : _password
         }
-        let conn =  await Mongo.connect(Auth.returnConnectionStringReplica(), { useNewUrlParser: true } );
+        let conn =  await Mongo.connect(Auth.returnConnectionString(), { useNewUrlParser: true } );
         let db   =  await conn.db("pearson");
         let doc  =  await db.collection("users").find(query).toArray()
 
@@ -77,7 +77,6 @@ class Auth {
             return false
         }
     }
-
 }
 
 let Auth_ = new Auth();
@@ -100,15 +99,12 @@ app.post('/login', Auth_.verifyUser , (req, res) => {
 app.post('/create', Auth_.createUser, (req, res) => {
     
     console.log(req.usercreated);
-    
+
     if ( req.usercreated == true){
         res.json("User created with: " + req.username + " " + req.password )
     }else{
         res.json("try again user already in db");
     }
-
-
-
 });
 
 app.listen(5000, () => console.log('Server started on port 5000'));
