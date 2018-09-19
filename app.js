@@ -102,7 +102,7 @@ app.post('/create', Auth_.createUser, (req, res) => {
     console.log(req.usercreated);
     
     if ( req.usercreated == true){
-        res.json("User created with: " + JSON.stringify(req.body))
+        res.json("User created with: " + req.body )
     }else{
         res.json("try again user already in db");
     }
