@@ -7,14 +7,25 @@ const Mongo = require('mongodb')
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-let Auth_ = new (class Auth {
+let url =  mongoUriBuilder({  
+            host: "localhost",
+            port: 27017,
+            database: 'pearson',
+    });
+        
+class Auth {
+    
+    constructor( _url ){
+        this.url = _url
+    }
+    
     async createUser(req, res, next ){
         let query = {
             username : req.body.username,
             password : req.body.password,
         }
         let create = async function(){
-            let conn =  await Mongo.connect(Auth.returnConnectionString(), { useNewUrlParser: true } );
+            let conn =  await Mongo.connect( this.url , { useNewUrlParser: true } );
             let db   =  await conn.db("pearson");
             await db.collection("users").insertOne(query)
         }
@@ -44,12 +55,12 @@ let Auth_ = new (class Auth {
             res.sendStatus(403);
         }
     };
-    static async userValidator( _username, _password ){
+    async userValidator( _username, _password ){
         let query = {
             username : _username,
             password : _password
         }
-        let conn =  await Mongo.connect(Auth.returnConnectionString(), { useNewUrlParser: true } );
+        let conn =  await Mongo.connect(this.url , { useNewUrlParser: true } );
         let db   =  await conn.db("pearson");
         let doc  =  await db.collection("users").find(query).toArray()
         if ( doc.length  == 1 ){
@@ -58,15 +69,12 @@ let Auth_ = new (class Auth {
             return false
         }
     }
-    static returnConnectionString(){
-        return mongoUriBuilder(
-            {  
-                host: "localhost",
-                port: 27017,
-                database: 'pearson',
-         });    
-    }
-})();
+  
+};
+
+
+let Auth_ = Auth(url);
+
 
 app.get('/', (req, res) => {
   res.json({
