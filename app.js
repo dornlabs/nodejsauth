@@ -7,20 +7,17 @@ const Mongo = require('mongodb')
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-class Auth {
-
+let Auth_ = new (class Auth {
     async createUser(req, res, next ){
         let query = {
             username : req.body.username,
             password : req.body.password,
         }
-
         let create = async function(){
-            let conn =  await Mongo.connect(Auth.returnConnectionStringReplica(), { useNewUrlParser: true } );
+            let conn =  await Mongo.connect(Auth.returnConnectionString(), { useNewUrlParser: true } );
             let db   =  await conn.db("pearson");
             await db.collection("users").insertOne(query)
         }
-
         if (await Auth.userValidator(query.username, query.password )==false){
             create()
             console.log("user created")
@@ -33,11 +30,7 @@ class Auth {
             req.usercreated = false
             next()
         }
-
-
     }
-
-
     static returnConnectionString(){
         return mongoUriBuilder(
             {  
@@ -46,7 +39,6 @@ class Auth {
                 database: 'pearson',
          });    
     }
-
     async verifyUser(req, res, next){
    
         let query = {
@@ -61,7 +53,6 @@ class Auth {
             res.sendStatus(403);
         }
     };
-
     static async userValidator( _username, _password ){
         let query = {
             username : _username,
@@ -77,9 +68,7 @@ class Auth {
             return false
         }
     }
-}
-
-let Auth_ = new Auth();
+})();
 
 
 app.get('/', (req, res) => {
