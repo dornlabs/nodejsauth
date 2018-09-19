@@ -31,14 +31,6 @@ let Auth_ = new (class Auth {
             next()
         }
     }
-    static returnConnectionString(){
-        return mongoUriBuilder(
-            {  
-                host: "localhost",
-                port: 27017,
-                database: 'pearson',
-         });    
-    }
     async verifyUser(req, res, next){   
         let query = {
             username : req.body.username,
@@ -65,6 +57,14 @@ let Auth_ = new (class Auth {
         } else {
             return false
         }
+    }
+    static returnConnectionString(){
+        return mongoUriBuilder(
+            {  
+                host: "localhost",
+                port: 27017,
+                database: 'pearson',
+         });    
     }
 })();
 
