@@ -18,17 +18,17 @@ class Auth {
         let create = async function(){
             let conn =  await Mongo.connect(Auth.returnConnectionStringReplica(), { useNewUrlParser: true } );
             let db   =  await conn.db("pearson");
-            let doc  =  await db.collection("users").insertOne(query)
+            await db.collection("users").insertOne(query)
         }
 
         if (await Auth.userValidator(query.username, query.password )==false){
             create()
             console.log("user created")
-
             req.usercreated = true
+            req.username = query.username
+            req.password = query.password
             next()
-        }else
-        {   
+        }else{   
             console.log("user not created")
             req.usercreated = false
             next()
@@ -102,7 +102,7 @@ app.post('/create', Auth_.createUser, (req, res) => {
     console.log(req.usercreated);
     
     if ( req.usercreated == true){
-        res.json("User created with: " + req.body )
+        res.json("User created with: " + req.username + " " + req.password )
     }else{
         res.json("try again user already in db");
     }
